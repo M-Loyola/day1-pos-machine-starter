@@ -48,15 +48,12 @@ public class PosMachine {
                 .collect(Collectors.groupingBy(barcode -> barcode, Collectors.counting()));
 
         return barcodeCountMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey()) // Sort entries by barcode
+                .sorted(Map.Entry.comparingByKey())
                 .map(entry -> {
                     String barcode = entry.getKey();
                     long quantity = entry.getValue();
                     Item item = itemMap.get(barcode);
-                    if (item != null) {
-                        return new ReceiptItem(item.getName(), (int) quantity, item.getPrice(), item.getPrice() * (int) quantity);
-                    }
-                    return null;
+                    return item != null ? new ReceiptItem(item.getName(), (int) quantity, item.getPrice(), item.getPrice() * (int) quantity) : null;
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
