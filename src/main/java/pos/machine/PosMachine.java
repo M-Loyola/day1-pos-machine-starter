@@ -8,6 +8,11 @@ import java.util.stream.Collectors;
 public class PosMachine {
     public String printReceipt(List<String> barcodes) {
         List<ReceiptItem> receiptItems = decodeToItems(barcodes);
+        calculateItemsCost(receiptItems);
+    }
+
+    private void calculateItemsCost(List<ReceiptItem> receiptItems) {
+        receiptItems.forEach(ReceiptItem::calculateSubTotal);
     }
 
     private List<ReceiptItem> decodeToItems(List<String> barcodes) {
