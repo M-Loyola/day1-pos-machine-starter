@@ -49,13 +49,9 @@ public class PosMachine {
 
         return barcodeCountMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
-                .map(entry -> {
-                    String barcode = entry.getKey();
-                    long quantity = entry.getValue();
-                    Item item = itemMap.get(barcode);
-                    return item != null ? new ReceiptItem(item.getName(), (int) quantity, item.getPrice(), item.getPrice() * (int) quantity) : null;
-                })
+                .map(entry -> itemMap.get(entry.getKey()))
                 .filter(Objects::nonNull)
+                .map(item -> new ReceiptItem(item.getName(), barcodeCountMap.get(item.getBarcode()).intValue(), item.getPrice(), item.getPrice() * barcodeCountMap.get(item.getBarcode()).intValue()))
                 .collect(Collectors.toList());
     }
 }
