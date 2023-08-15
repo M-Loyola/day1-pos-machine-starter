@@ -9,6 +9,13 @@ public class PosMachine {
     public String printReceipt(List<String> barcodes) {
         List<ReceiptItem> receiptItems = decodeToItems(barcodes);
         calculateItemsCost(receiptItems);
+        int totalCost = calculateTotalCost(receiptItems);
+    }
+
+    private int calculateTotalCost(List<ReceiptItem> receiptItems) {
+        return receiptItems.stream()
+                .mapToInt(ReceiptItem::getSubTotal)
+                .sum();
     }
 
     private void calculateItemsCost(List<ReceiptItem> receiptItems) {
