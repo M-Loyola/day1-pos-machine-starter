@@ -1,5 +1,6 @@
 package pos.machine;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,16 +43,16 @@ public class PosMachine {
     private List<ReceiptItem> decodeToItems(List<String> barcodes) {
         List<Item> items = ItemsLoader.loadAllItems();
         Map<String, Item> itemMap = items.stream()
+                .distinct()
                 .collect(Collectors.toMap(Item::getBarcode, item -> item));
 
-        Map<String, Long> barcodeCountMap = barcodes.stream()
-                .collect(Collectors.groupingBy(barcode -> barcode, Collectors.counting()));
-
-        return barcodeCountMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(entry -> itemMap.get(entry.getKey()))
+        return itemMap.values().stream()
+                .sorted(Comparator.comparing(Item::getBarcode))
+                .map(item -> {
+                    int quantity = (int) barcodes.stream().filter(code -> code.equals(item.getBarcode())).count();
+                    return quantity > 0 ? new ReceiptItem(item.getName(), quantity, item.getPrice(), item.getPrice() * quantity) : null;
+                })
                 .filter(Objects::nonNull)
-                .map(item -> new ReceiptItem(item.getName(), barcodeCountMap.get(item.getBarcode()).intValue(), item.getPrice(), item.getPrice() * barcodeCountMap.get(item.getBarcode()).intValue()))
                 .collect(Collectors.toList());
     }
 }
